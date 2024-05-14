@@ -1,30 +1,24 @@
-// let mut spy = spy_events(SpyOn::One(staking_contract_address));
-use starknet::{ get_caller_address, ContractAddress }; 
-use snforge_std::{ 
-    declare,
-    ContractClassTrait, 
-    start_prank, 
-    stop_prank, 
-    CheatTarget, 
-    spy_events, 
-    SpyOn, 
-    EventSpy, 
-    EventFetcher, 
-    Event,
+use starknet::{get_caller_address, ContractAddress};
+use snforge_std::{
+    declare, ContractClassTrait, start_prank, stop_prank, CheatTarget, spy_events, SpyOn, EventSpy,
+    EventFetcher, Event,
 };
 
 
-use hands_on::counter_v3::{ ICounterV3Dispatcher, ICounterV3DispatcherTrait, ICounterV3SafeDispatcher, ICounterV3SafeDispatcherTrait};
+use hands_on::counter_v3::{
+    ICounterV3Dispatcher, ICounterV3DispatcherTrait, ICounterV3SafeDispatcher,
+    ICounterV3SafeDispatcherTrait
+};
 
 // utility deploy function 
 fn deploy_contract_with_constructor() -> ContractAddress {
-    // declare
+    // declare 
     let contract_class = declare("CounterV3").unwrap();
 
-    // constructor args
+    // pass in constructor args
     let constructor_calldata = array![Accounts::owner().into()];
 
-    // deploy
+    // deploy contract to generate contract address
     let (contract_address, _) = contract_class.deploy(@constructor_calldata).unwrap();
     contract_address
 }
@@ -36,35 +30,28 @@ fn test_emitted_event() {
     let count_1 = dispatcher.get_count();
     assert_eq!(count_1, 0);
 
-    
-    // initiate increas_count with owner account
+    // initiate increase_count with owner account
     start_prank(CheatTarget::One(contract_address), Accounts::owner());
-    let mut spy = spy_events(SpyOn::One(contract_address)); // Ad 1.
+    let mut spy = spy_events(SpyOn::One(contract_address));
     assert(spy._id == 0, 'Id should be 0');
 
-
     dispatcher.increase_count(10);
-    spy.fetch_events();  // Ad 2.
+    spy.fetch_events();
 
     assert(spy.events.len() == 1, 'there should be one event');
 
-    let (from, event) = spy.events.at(0); // Ad 3.
+    let (from, event) = spy.events.at(0);
     assert_eq!(from, @contract_address);
     println!("stored count event___{}", event.keys.at(0));
     assert_eq!(event.keys.at(0), @selector!("StoredCount"));
 
-
     let count_2 = dispatcher.get_count();
     assert_eq!(count_2, 10);
     println!("events len___{}", spy.events.len());
-    // 1057875066477295396974279020442499605303922819349549694903959216570891400701
-
-
-    // assert(spy.events.len() == 0, 'There should be no events');
-
 }
 
 
+// test accounts to simulate different users 
 pub mod Accounts {
     use starknet::ContractAddress;
     use core::traits::TryInto;

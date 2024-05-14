@@ -1,16 +1,16 @@
-use starknet::{ get_caller_address, ContractAddress };
-use snforge_std::{ 
-    declare,
-    ContractClassTrait, 
-    start_prank, 
-    stop_prank, 
-    CheatTarget
- };
- use hands_on::{ counter_v4::{ ICounterV4Dispatcher, ICounterV4DispatcherTrait, ICounterV4SafeDispatcher, ICounterV4SafeDispatcherTrait}, errors:: Errors } ;
+use starknet::{get_caller_address, ContractAddress};
+use snforge_std::{declare, ContractClassTrait, start_prank, stop_prank, CheatTarget};
+use hands_on::{
+    counter_v4::{
+        ICounterV4Dispatcher, ICounterV4DispatcherTrait, ICounterV4SafeDispatcher,
+        ICounterV4SafeDispatcherTrait
+    },
+    errors::Errors
+};
 
 
- // deploy util function 
- fn deploy_contract_with_constructor() -> ContractAddress {
+// deploy util function 
+fn deploy_contract_with_constructor() -> ContractAddress {
     // declare
     let contract_class = declare("CounterV4").unwrap();
 
@@ -19,15 +19,15 @@ use snforge_std::{
 
     // deploy
     let (contract_address, _) = contract_class.deploy(@constructor_calldata).unwrap();
-    contract_address 
- }
+    contract_address
+}
 
 
 #[test]
 fn test_set_new_owner() {
     let contract_address = deploy_contract_with_constructor();
 
-    let dispatcher = ICounterV4Dispatcher{ contract_address };
+    let dispatcher = ICounterV4Dispatcher { contract_address };
     let owner = Accounts::owner();
 
     let count_1 = dispatcher.get_count();
@@ -38,12 +38,11 @@ fn test_set_new_owner() {
 
     let user_1 = Accounts::user_1();
 
-    start_prank(CheatTarget::One(contract_address), owner );
+    start_prank(CheatTarget::One(contract_address), owner);
 
     dispatcher.set_owner(user_1);
 
     let contract_owner_2 = dispatcher.get_owner();
-    // dispatcher.get_owner()
     assert_eq!(user_1, contract_owner_2);
 }
 
@@ -55,7 +54,7 @@ fn test_cannot_set_addr_zero_as_new_owner() {
     let zero_account = Accounts::zero();
 
     let contract_address = deploy_contract_with_constructor();
-    let safe_dispatcher = ICounterV4SafeDispatcher{ contract_address };
+    let safe_dispatcher = ICounterV4SafeDispatcher { contract_address };
 
     let contract_owner_1 = safe_dispatcher.get_owner();
     assert_eq!(owner, contract_owner_1.unwrap());
@@ -65,7 +64,7 @@ fn test_cannot_set_addr_zero_as_new_owner() {
 
     start_prank(CheatTarget::One(contract_address), owner);
     match safe_dispatcher.set_owner(zero_account) {
-        Result::Ok(_) => core::panic_with_felt252('should have panicked'), 
+        Result::Ok(_) => core::panic_with_felt252('should have panicked'),
         Result::Err(panic_data) => {
             println!("panic data____{:?}__", panic_data);
             println!("panic data____{:?}__", panic_data.at(0));
@@ -84,7 +83,7 @@ fn test_non_owner_attempt_to_set_new_owner() {
     let zero_account = Accounts::zero();
 
     let contract_address = deploy_contract_with_constructor();
-    let safe_dispatcher = ICounterV4SafeDispatcher{ contract_address };
+    let safe_dispatcher = ICounterV4SafeDispatcher { contract_address };
 
     let contract_owner_1 = safe_dispatcher.get_owner();
     assert_eq!(owner, contract_owner_1.unwrap());
@@ -94,7 +93,7 @@ fn test_non_owner_attempt_to_set_new_owner() {
 
     start_prank(CheatTarget::One(contract_address), user_1);
     match safe_dispatcher.set_owner(user_1) {
-        Result::Ok(_) => core::panic_with_felt252('should have panicked'), 
+        Result::Ok(_) => core::panic_with_felt252('should have panicked'),
         Result::Err(panic_data) => {
             println!("panic data____{:?}__", panic_data);
             println!("panic data____{:?}__", panic_data.at(0));
@@ -102,11 +101,6 @@ fn test_non_owner_attempt_to_set_new_owner() {
         }
     }
 }
-
-
-
-
-
 
 
 pub mod Accounts {

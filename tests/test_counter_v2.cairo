@@ -1,13 +1,7 @@
 use starknet::{ContractAddress, get_caller_address};
 use snforge_std::{
-    declare, 
-    ContractClassTrait, 
-    start_prank, 
-    stop_prank, 
-    CheatTarget, 
-    CheatSpan, prank
+    declare, ContractClassTrait, start_prank, stop_prank, CheatTarget, CheatSpan, prank
 };
-// use snforge_std::CheatnetState::prank;
 
 use hands_on::{
     counter_v2::{
@@ -84,6 +78,7 @@ fn test_increase_count_with_zero_amount() {
     let count_1 = safe_dispatcher.get_count().unwrap();
     assert_eq!(count_1, 0);
 
+    // 
     start_prank(CheatTarget::One(contract_address), owner);
     match safe_dispatcher.increase_count(0) {
         Result::Ok(_) => core::panic_with_felt252('Should have panicked'),
@@ -91,7 +86,7 @@ fn test_increase_count_with_zero_amount() {
     }
 }
 
-// positive 
+// positive txn
 #[test]
 fn test_increase_count() {
     let contract_address = deploy_contract_with_constructor();
@@ -103,8 +98,6 @@ fn test_increase_count() {
     println!("owner from count____{:?}", owner_from_counter);
     let owner: ContractAddress = Accounts::owner();
 
-    // Prank the contract_address for a span of 2 target calls (here, calls to contract_address)
-    // prank(CheatTarget::One(contract_address), owner, CheatSpan::TargetCalls(2));
     start_prank(CheatTarget::One(contract_address), owner);
 
     // owner increase count txn
@@ -120,7 +113,6 @@ fn test_increase_count() {
     // owner increase count txn
     dispatcher.increase_count(5);
     let count_3: u32 = dispatcher.get_count();
-    // core::panic_with_felt252('should have panicked')
 
     let count_sum_result_2: u32 = add_num(count_sum_result, 5);
     assert_eq!(count_sum_result_2, 15);

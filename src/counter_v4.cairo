@@ -30,7 +30,7 @@ mod CounterV4 {
 
     #[derive(Drop, starknet::Event)]
     struct StoredCount {
-        new_count: u32, 
+        new_count: u32,
         caller: ContractAddress
     }
 
@@ -48,7 +48,7 @@ mod CounterV4 {
             let current_count: u32 = self.count.read();
             let result = hands_on::addition::add_num(current_count, amount);
             self.count.write(result);
-            self.emit(StoredCount { new_count: result, caller: caller});
+            self.emit(StoredCount { new_count: result, caller: caller });
         }
 
         fn get_count(self: @ContractState) -> u32 {

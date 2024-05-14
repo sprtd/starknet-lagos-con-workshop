@@ -55,10 +55,7 @@ fn test_increase_count() {
     assert(count_1 == 0, Errors::INVALID_COUNT_VALUE);
     assert_eq!(count_1, 0);
 
-    // prank(CheatTarget::One(contract_address), user_1, CheatSpan::TargetCalls(1));
-
     let increase_count_result = counter.increase_count(10);
-    // assert!(increase_count_result.is_err());
     assert!(increase_count_result.is_ok());
     let final_count: u32 = add_num(0, 10);
     assert_eq!(final_count, 10);
