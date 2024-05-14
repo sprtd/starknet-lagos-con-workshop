@@ -1,4 +1,4 @@
-# Starknet Lagos Conference Handson Test Workshop
+# Starknet Lagos Conference Hands-on Testing Workshop
 
 ## Introduction to Testing Using `snforge`
 
@@ -23,7 +23,7 @@ stop_prank(CheatTarget::One(contract_address));
 
 ---
 ### Error Handling 
-Some tests are expected fail. This is useful when you want to verify that an action fails as expected. The following methodologies can be deployed to 
+Some tests are expected fail. This is useful when you want to verify that an action fails as expected. The following methodologies can be deployed:
 1. Using `#[should_panic(expected: ('panic message', ))]` attribute
 
 2. Using `SafeDispatcher`, we can test that the function in fact panics with an expected message.
